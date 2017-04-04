@@ -29,7 +29,7 @@ struct GBCore {
 	struct mCheatDevice* cheatDevice;
 };
 
-static bool _GBCoreInit(struct mCore* core) {
+bool _GBCoreInit(struct mCore* core) {
 	struct GBCore* gbcore = (struct GBCore*) core;
 
 	struct LR35902Core* cpu = anonymousMemoryMap(sizeof(struct LR35902Core));
@@ -109,13 +109,13 @@ static void _GBCoreLoadConfig(struct mCore* core, const struct mCoreConfig* conf
 #endif
 }
 
-static void _GBCoreDesiredVideoDimensions(struct mCore* core, unsigned* width, unsigned* height) {
+void _GBCoreDesiredVideoDimensions(struct mCore* core, unsigned* width, unsigned* height) {
 	UNUSED(core);
 	*width = GB_VIDEO_HORIZONTAL_PIXELS;
 	*height = GB_VIDEO_VERTICAL_PIXELS;
 }
 
-static void _GBCoreSetVideoBuffer(struct mCore* core, color_t* buffer, size_t stride) {
+void _GBCoreSetVideoBuffer(struct mCore* core, color_t* buffer, size_t stride) {
 	struct GBCore* gbcore = (struct GBCore*) core;
 	gbcore->renderer.outputBuffer = buffer;
 	gbcore->renderer.outputBufferStride = stride;
@@ -166,7 +166,7 @@ static void _GBCoreSetAVStream(struct mCore* core, struct mAVStream* stream) {
 	}
 }
 
-static bool _GBCoreLoadROM(struct mCore* core, struct VFile* vf) {
+bool _GBCoreLoadROM(struct mCore* core, struct VFile* vf) {
 	return GBLoadROM(core->board, vf);
 }
 
@@ -176,7 +176,7 @@ static bool _GBCoreLoadBIOS(struct mCore* core, struct VFile* vf, int type) {
 	return true;
 }
 
-static bool _GBCoreLoadSave(struct mCore* core, struct VFile* vf) {
+bool _GBCoreLoadSave(struct mCore* core, struct VFile* vf) {
 	return GBLoadSave(core->board, vf);
 }
 
@@ -210,7 +210,7 @@ static void _GBCoreUnloadROM(struct mCore* core) {
 	return GBUnloadROM(core->board);
 }
 
-static void _GBCoreReset(struct mCore* core) {
+void _GBCoreReset(struct mCore* core) {
 	struct GBCore* gbcore = (struct GBCore*) core;
 	struct GB* gb = (struct GB*) core->board;
 	if (gbcore->renderer.outputBuffer) {
@@ -266,11 +266,13 @@ static void _GBCoreReset(struct mCore* core) {
 	LR35902Reset(core->cpu);
 }
 
-static void _GBCoreRunFrame(struct mCore* core) {
+void _GBCoreRunFrame(struct mCore* core) {
 	struct GB* gb = core->board;
 	int32_t frameCounter = gb->video.frameCounter;
 	while (gb->video.frameCounter == frameCounter) {
-		LR35902Run(core->cpu);
+		if(LR35902Run(core->cpu)) {
+            break;
+        }
 	}
 }
 
@@ -308,12 +310,12 @@ static void _GBCoreSetKeys(struct mCore* core, uint32_t keys) {
 	gbcore->keys = keys;
 }
 
-static void _GBCoreAddKeys(struct mCore* core, uint32_t keys) {
+void _GBCoreAddKeys(struct mCore* core, uint32_t keys) {
 	struct GBCore* gbcore = (struct GBCore*) core;
 	gbcore->keys |= keys;
 }
 
-static void _GBCoreClearKeys(struct mCore* core, uint32_t keys) {
+void _GBCoreClearKeys(struct mCore* core, uint32_t keys) {
 	struct GBCore* gbcore = (struct GBCore*) core;
 	gbcore->keys &= ~keys;
 }

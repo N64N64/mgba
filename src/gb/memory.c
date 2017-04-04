@@ -25,7 +25,9 @@ static uint8_t GBFastLoad8(struct LR35902Core* cpu, uint16_t address) {
 	return cpu->memory.activeRegion[address & cpu->memory.activeMask];
 }
 
+uint16_t MGBA_ACTIVE_ADDR = 0;
 static void GBSetActiveRegion(struct LR35902Core* cpu, uint16_t address) {
+    MGBA_ACTIVE_ADDR = address;
 	struct GB* gb = (struct GB*) cpu->master;
 	struct GBMemory* memory = &gb->memory;
 	switch (address >> 12) {

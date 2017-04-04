@@ -39,9 +39,13 @@ struct mCore {
 
 #if !defined(MINIMAL_CORE) || MINIMAL_CORE < 2
 	struct mDirectorySet dirs;
+#else
+#error ITS BAD
 #endif
 #ifndef MINIMAL_CORE
 	struct mInputMap inputMap;
+#else
+#error ITS BAD
 #endif
 	struct mCoreConfig config;
 	struct mCoreOptions opts;

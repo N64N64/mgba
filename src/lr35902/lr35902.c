@@ -6,6 +6,7 @@
 #include "lr35902.h"
 
 #include "isa-lr35902.h"
+#include <third-party/uthash.h>
 
 void LR35902Init(struct LR35902Core* cpu) {
 	cpu->master->init(cpu, cpu->master);
@@ -155,9 +156,81 @@ void LR35902Tick(struct LR35902Core* cpu) {
 	}
 }
 
-void LR35902Run(struct LR35902Core* cpu) {
+#ifdef _3DS
+bool aaas_call_callback(int callback);
+#endif
+
+#define LUA_NOREF (-2)
+#define hookz_size 0x10000
+
+struct hook_t {
+    struct hook_t *next;
+#ifdef _3DS
+    int callback;
+#else
+    bool (*callback)();
+#endif
+};
+static bool (*call_callback)(int);
+static struct hook_t *hookz[hookz_size];
+static bool initted_hookz = false;
+static inline void init_hookz()
+{
+    if(!initted_hookz) {
+        for(int i = 0; i < hookz_size; i++) {
+            hookz[i] = NULL;
+        }
+        initted_hookz = true;
+    }
+}
+
+#include <gb/gb.h>
+#include <gb/memory.h>
+
+bool mgba_should_print = false;
+
+static inline bool check_hook_pc(struct LR35902Core *cpu)
+{
+    init_hookz();
+
+    struct GB *gb = (struct GB *)cpu->master;
+    int bank = gb->memory.currentBank;
+
+    bool should_halt = false;
+    for(struct hook_t *hook = hookz[cpu->pc]; hook != NULL; hook = hook->next) {
+        bool k;
+#ifdef _3DS
+        k = aaas_call_callback(hook->callback);
+#else
+        k = hook->callback();
+#endif
+        should_halt = k || should_halt;
+    }
+    return should_halt;
+}
+
+#ifdef _3DS
+void aaas_add_pc_hook(int bank, int pc, int callback)
+#else
+void PC_HOOK(int bank, int pc, bool (*callback)())
+#endif
+{
+    init_hookz();
+
+    struct hook_t *hook = malloc(sizeof(struct hook_t));
+    hook->callback = callback;
+    hook->next = hookz[pc];
+
+    hookz[pc] = hook;
+}
+
+bool LR35902Run(struct LR35902Core* cpu) {
 	bool running = true;
 	while (running || cpu->executionState != LR35902_CORE_FETCH) {
+		if(check_hook_pc(cpu)) {
+            return true;
+        }
+
 		_LR35902Step(cpu);
 		if (cpu->cycles + 2 >= cpu->nextEvent) {
 			int32_t diff = cpu->nextEvent - cpu->cycles;
@@ -169,6 +242,7 @@ void LR35902Run(struct LR35902Core* cpu) {
 		} else {
 			cpu->cycles += 2;
 		}
+
 		cpu->executionState = LR35902_CORE_FETCH;
 		cpu->instruction(cpu);
 		++cpu->cycles;
@@ -177,4 +251,5 @@ void LR35902Run(struct LR35902Core* cpu) {
 			running = false;
 		}
 	}
+    return false;
 }
