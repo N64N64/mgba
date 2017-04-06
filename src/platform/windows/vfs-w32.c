@@ -33,6 +33,9 @@ struct VDirW32 {
 };
 
 struct VDir* VDirOpen(const char* path) {
+#ifdef WINDOWS_HAX
+	return 0;
+#else
 	if (!path || !path[0]) {
 		return 0;
 	}
@@ -65,6 +68,7 @@ struct VDir* VDirOpen(const char* path) {
 	vd->vde.ffData = ffData;
 
 	return &vd->d;
+#endif
 }
 
 bool _vdwClose(struct VDir* vd) {
@@ -80,6 +84,7 @@ bool _vdwClose(struct VDir* vd) {
 }
 
 void _vdwRewind(struct VDir* vd) {
+#ifndef WINDOWS_HAX
 	struct VDirW32* vdw = (struct VDirW32*) vd;
 	FindClose(vdw->handle);
 	wchar_t name[MAX_PATH + 1];
@@ -90,6 +95,7 @@ void _vdwRewind(struct VDir* vd) {
 		vdw->vde.utf8Name = NULL;
 	}
 	vdw->handle = FindFirstFileW(name, &vdw->vde.ffData);
+#endif
 }
 
 struct VDirEntry* _vdwListNext(struct VDir* vd) {
@@ -106,6 +112,7 @@ struct VDirEntry* _vdwListNext(struct VDir* vd) {
 }
 
 struct VFile* _vdwOpenFile(struct VDir* vd, const char* path, int mode) {
+#ifndef WINDOWS_HAX
 	struct VDirW32* vdw = (struct VDirW32*) vd;
 	if (!path) {
 		return 0;
@@ -118,9 +125,13 @@ struct VFile* _vdwOpenFile(struct VDir* vd, const char* path, int mode) {
 	struct VFile* file = VFileOpen(combined, mode);
 	free(combined);
 	return file;
+#endif
 }
 
 struct VDir* _vdwOpenDir(struct VDir* vd, const char* path) {
+#ifdef WINDOWS_HAX
+	return 0;
+#else
 	struct VDirW32* vdw = (struct VDirW32*) vd;
 	if (!path) {
 		return 0;
@@ -136,9 +147,13 @@ struct VDir* _vdwOpenDir(struct VDir* vd, const char* path) {
 	}
 	free(combined);
 	return vd2;
+#endif
 }
 
 bool _vdwDeleteFile(struct VDir* vd, const char* path) {
+#ifdef WINDOWS_HAX
+	return 0;
+#else
 	struct VDirW32* vdw = (struct VDirW32*) vd;
 	if (!path) {
 		return 0;
@@ -151,6 +166,7 @@ bool _vdwDeleteFile(struct VDir* vd, const char* path) {
 	bool ret = DeleteFile(combined);
 	free(combined);
 	return ret;
+#endif
 }
 
 const char* _vdweName(struct VDirEntry* vde) {
