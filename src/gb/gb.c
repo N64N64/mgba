@@ -600,6 +600,7 @@ void GBStop(struct LR35902Core* cpu) {
 		gb->memory.io[REG_KEY1] = 0;
 		gb->memory.io[REG_KEY1] |= gb->doubleSpeed << 7;
 	} else if (cpu->bus) {
+#ifndef DEBUGGER_HAX
 		if (cpu->components && cpu->components[CPU_COMPONENT_DEBUGGER]) {
 			struct mDebuggerEntryInfo info = {
 				.address = cpu->pc - 1,
@@ -607,6 +608,7 @@ void GBStop(struct LR35902Core* cpu) {
 			};
 			mDebuggerEnter((struct mDebugger*) cpu->components[CPU_COMPONENT_DEBUGGER], DEBUGGER_ENTER_ILLEGAL_OP, &info);
 		}
+#endif
 		// Hang forever
 		gb->memory.ime = 0;
 		cpu->pc -= 2;
@@ -617,6 +619,7 @@ void GBStop(struct LR35902Core* cpu) {
 void GBIllegal(struct LR35902Core* cpu) {
 	struct GB* gb = (struct GB*) cpu->master;
 	mLOG(GB, GAME_ERROR, "Hit illegal opcode at address %04X:%02X\n", cpu->pc, cpu->bus);
+#ifndef DEBUGGER_HAX
 	if (cpu->components && cpu->components[CPU_COMPONENT_DEBUGGER]) {
 		struct mDebuggerEntryInfo info = {
 			.address = cpu->pc,
@@ -624,6 +627,7 @@ void GBIllegal(struct LR35902Core* cpu) {
 		};
 		mDebuggerEnter((struct mDebugger*) cpu->components[CPU_COMPONENT_DEBUGGER], DEBUGGER_ENTER_ILLEGAL_OP, &info);
 	}
+#endif
 	// Hang forever
 	gb->memory.ime = 0;
 	--cpu->pc;
@@ -684,7 +688,7 @@ void GBGetGameCode(const struct GB* gb, char* out) {
 
 void GBFrameEnded(struct GB* gb) {
 	GBSramClean(gb, gb->video.frameCounter);
-
+#ifndef WINDOWS_HAX
 	if (gb->cpu->components && gb->cpu->components[CPU_COMPONENT_CHEAT_DEVICE]) {
 		struct mCheatDevice* device = (struct mCheatDevice*) gb->cpu->components[CPU_COMPONENT_CHEAT_DEVICE];
 		size_t i;
@@ -693,4 +697,5 @@ void GBFrameEnded(struct GB* gb) {
 			mCheatRefresh(device, cheats);
 		}
 	}
+#endif
 }

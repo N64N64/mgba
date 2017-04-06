@@ -15,6 +15,7 @@ const uint32_t M_CHEAT_DEVICE_ID = 0xABADC0DE;
 
 mLOG_DEFINE_CATEGORY(CHEATS, "Cheats");
 
+#ifndef WINDOWS_HAX
 DEFINE_VECTOR(mCheatList, struct mCheat);
 DEFINE_VECTOR(mCheatSets, struct mCheatSet*);
 DEFINE_VECTOR(StringList, char*);
@@ -384,3 +385,64 @@ void mCheatDeviceDeinit(struct mCPUComponent* component) {
 		cheats->remove(cheats, device);
 	}
 }
+#else
+
+// just disable it all so it compiles. who cares about cheats, anyway?
+
+static int32_t _readMem(struct mCore* core, uint32_t address, int width) {
+	return 0;
+}
+
+static void _writeMem(struct mCore* core, uint32_t address, int width, int32_t value) {
+}
+
+static void mCheatDeviceInit(void*, struct mCPUComponent*);
+static void mCheatDeviceDeinit(struct mCPUComponent*);
+
+void mCheatDeviceCreate(struct mCheatDevice* device) {
+}
+
+void mCheatDeviceDestroy(struct mCheatDevice* device) {
+}
+
+void mCheatDeviceClear(struct mCheatDevice* device) {
+}
+
+void mCheatSetInit(struct mCheatSet* set, const char* name) {
+}
+
+void mCheatSetDeinit(struct mCheatSet* set) {
+}
+
+void mCheatSetRename(struct mCheatSet* set, const char* name) {
+}
+
+bool mCheatAddLine(struct mCheatSet* set, const char* line, int type) {
+	return true;
+}
+
+void mCheatAddSet(struct mCheatDevice* device, struct mCheatSet* cheats) {
+}
+
+void mCheatRemoveSet(struct mCheatDevice* device, struct mCheatSet* cheats) {
+}
+
+bool mCheatParseFile(struct mCheatDevice* device, struct VFile* vf) {
+	return true;
+}
+
+bool mCheatSaveFile(struct mCheatDevice* device, struct VFile* vf) {
+	return true;
+}
+
+void mCheatRefresh(struct mCheatDevice* device, struct mCheatSet* cheats) {
+}
+
+void mCheatDeviceInit(void* cpu, struct mCPUComponent* component) {
+}
+
+void mCheatDeviceDeinit(struct mCPUComponent* component) {
+}
+
+
+#endif

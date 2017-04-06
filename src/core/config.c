@@ -159,6 +159,7 @@ bool mCoreConfigSavePath(const struct mCoreConfig* config, const char* path) {
 void mCoreConfigMakePortable(const struct mCoreConfig* config) {
 	struct VFile* portable = 0;
 #ifdef _WIN32
+#ifndef WINDOWS_HAX
 	char out[MAX_PATH];
 	wchar_t wpath[MAX_PATH];
 	wchar_t wprojectName[MAX_PATH];
@@ -169,6 +170,7 @@ void mCoreConfigMakePortable(const struct mCoreConfig* config) {
 	WideCharToMultiByte(CP_UTF8, 0, wpath, -1, out, MAX_PATH, 0, 0);
 	StringCchCatA(out, MAX_PATH, "\\portable.ini");
 	portable = VFileOpen(out, O_WRONLY | O_CREAT);
+#endif
 #elif defined(PSP2) || defined(_3DS) || defined(GEKKO)
 	// Already portable
 #else
@@ -186,6 +188,7 @@ void mCoreConfigMakePortable(const struct mCoreConfig* config) {
 void mCoreConfigDirectory(char* out, size_t outLength) {
 	struct VFile* portable;
 #ifdef _WIN32
+#ifndef WINDOWS_HAX
 	wchar_t wpath[MAX_PATH];
 	wchar_t wprojectName[MAX_PATH];
 	MultiByteToWideChar(CP_UTF8, 0, projectName, -1, wprojectName, MAX_PATH);
@@ -205,6 +208,7 @@ void mCoreConfigDirectory(char* out, size_t outLength) {
 		CreateDirectoryW(wpath, NULL);
 	}
 	WideCharToMultiByte(CP_UTF8, 0, wpath, -1, out, outLength, 0, 0);
+#endif
 #elif defined(PSP2)
 	UNUSED(portable);
 	snprintf(out, outLength, "ux0:data/%s", projectName);

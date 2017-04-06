@@ -443,9 +443,11 @@ static bool _GBCoreSupportsDebuggerType(struct mCore* core, enum mDebuggerType t
 
 static struct mDebuggerPlatform* _GBCoreDebuggerPlatform(struct mCore* core) {
 	struct GBCore* gbcore = (struct GBCore*) core;
+#ifndef DEBUGGER_HAX
 	if (!gbcore->debuggerPlatform) {
 		gbcore->debuggerPlatform = LR35902DebuggerPlatformCreate();
 	}
+#endif
 	return gbcore->debuggerPlatform;
 }
 

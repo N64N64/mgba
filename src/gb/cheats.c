@@ -111,6 +111,7 @@ static void GBCheatRemoveSet(struct mCheatSet* cheats, struct mCheatDevice* devi
 }
 
 static bool GBCheatAddCodebreaker(struct GBCheatSet* cheats, uint16_t address, uint8_t data) {
+#ifndef WINDOWS_HAX
 	struct mCheat* cheat = mCheatListAppend(&cheats->d.list);
 	cheat->type = CHEAT_ASSIGN;
 	cheat->width = 1;
@@ -118,6 +119,7 @@ static bool GBCheatAddCodebreaker(struct GBCheatSet* cheats, uint16_t address, u
 	cheat->operand = data;
 	cheat->repeat = 1;
 	cheat->negativeRepeat = 0;
+#endif
 	return true;
 }
 
@@ -174,6 +176,7 @@ static bool GBCheatAddGameGenieLine(struct GBCheatSet* cheats, const char* line)
 }
 
 static bool GBCheatAddVBALine(struct GBCheatSet* cheats, const char* line) {
+#ifndef WINDOWS_HAX
 	uint16_t address;
 	uint8_t value;
 	const char* lineNext = hex16(line, &address);
@@ -190,6 +193,7 @@ static bool GBCheatAddVBALine(struct GBCheatSet* cheats, const char* line) {
 	cheat->operand = value;
 	cheat->repeat = 1;
 	cheat->negativeRepeat = 0;
+#endif
 	return true;
 }
 

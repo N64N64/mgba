@@ -75,8 +75,12 @@ float strtof_u(const char* restrict str, char** restrict end) {
 #ifndef HAVE_LOCALTIME_R
 struct tm* localtime_r(const time_t* t, struct tm* date) {
 #ifdef _WIN32
+#ifdef WINDOWS_HAX
+    return 0;
+#else
 	localtime_s(date, t);
 	return date;
+#endif
 #elif defined(PSP2)
 	return sceKernelLibcLocaltime_r(t, date);
 #else

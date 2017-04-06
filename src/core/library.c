@@ -37,6 +37,7 @@ void mLibraryLoadDirectory(struct mLibrary* library, struct VDir* dir) {
 }
 
 void mLibraryAddEntry(struct mLibrary* library, const char* filename, struct VFile* vf) {
+#ifndef WINDOWS_HAX
 	struct mCore* core;
 	if (!vf) {
 		vf = VFileOpen(filename, O_RDONLY);
@@ -60,4 +61,5 @@ void mLibraryAddEntry(struct mLibrary* library, const char* filename, struct VFi
 	} else {
 		vf->close(vf);
 	}
+#endif
 }

@@ -23,6 +23,11 @@
 // WinSock2 gets very angry if it's included too late
 #include <winsock2.h>
 #endif
+#ifdef WINDOWS_HAX
+#define PATH_MAX MAX_PATH
+typedef intptr_t ssize_t;
+typedef long off_t;
+#endif
 #ifdef _MSC_VER
 #include <Windows.h>
 #include <sys/types.h>
