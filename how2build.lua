@@ -8,10 +8,16 @@ function default()
         --'M_CORE_GBA',
         'NDEBUG',
         'DEBUGGER_HAX',
-		'DISABLE_THREADING',
+        'DISABLE_THREADING',
     }
     if ffi.os == 'Windows' then
         table.insert(b.defines, 'WINDOWS_HAX')
+    end
+    if ffi.os == 'Linux' then
+        local t = {'HAVE_LOCALE', 'HAVE_LOCALTIME_R', 'HAVE_SETLOCALE', 'HAVE_STRDUP', 'HAVE_STRNDUP', 'HAVE_UMASK', '_GNU_SOURCE'}
+        for k,v in pairs(t) do
+            table.insert(b.defines, v)
+        end
     end
     b.include_dirs = {
         'src',
@@ -31,8 +37,8 @@ function default()
         'AITE_DECL.c'
     )
     table.removecontents(b.src, table.merge(
-		fs.find('src/lr35902/debugger', '*.c'),
-		fs.find('src/arm/debugger', '*.c'),
+        fs.find('src/lr35902/debugger', '*.c'),
+        fs.find('src/arm/debugger', '*.c'),
         fs.find('src/core/test', '*.c'),
         fs.find('src/gba/test', '*.c'),
         fs.find('src/gb/test', '*.c'),
@@ -40,8 +46,8 @@ function default()
         fs.find('src/util/gui', '*.c'),
         'src/util/vfs/vfs-devlist.c',
         'src/util/vfs/vfs-zip.c',
-		'src/util/nointro.c',
-		ffi.os == 'Windows' and 'src/util/vfs/vfs-dirent.c'
+        'src/util/nointro.c',
+        ffi.os == 'Windows' and 'src/util/vfs/vfs-dirent.c'
     ))
 
     b:link(b:compile())
