@@ -131,7 +131,7 @@ static void _GBCorePutPixels(struct mCore* core, const void* buffer, size_t stri
 	gbcore->renderer.d.putPixels(&gbcore->renderer.d, stride, buffer);
 }
 
-static struct blip_t* _GBCoreGetAudioChannel(struct mCore* core, int ch) {
+struct blip_t* _GBCoreGetAudioChannel(struct mCore* core, int ch) {
 	struct GB* gb = core->board;
 	switch (ch) {
 	case 0:
@@ -330,7 +330,7 @@ static int32_t _GBCoreFrameCycles(const  struct mCore* core) {
 	return GB_VIDEO_TOTAL_LENGTH;
 }
 
-static int32_t _GBCoreFrequency(const struct mCore* core) {
+int32_t _GBCoreFrequency(const struct mCore* core) {
 	UNUSED(core);
 	// TODO: GB differences
 	return DMG_LR35902_FREQUENCY;
