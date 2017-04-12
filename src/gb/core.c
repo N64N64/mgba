@@ -158,7 +158,7 @@ static void _GBCoreSetCoreCallbacks(struct mCore* core, struct mCoreCallbacks* c
 	gb->coreCallbacks = coreCallbacks;
 }
 
-static void _GBCoreSetAVStream(struct mCore* core, struct mAVStream* stream) {
+void _GBCoreSetAVStream(struct mCore* core, struct mAVStream* stream) {
 	struct GB* gb = core->board;
 	gb->stream = stream;
 	if (stream && stream->videoDimensionsChanged) {
